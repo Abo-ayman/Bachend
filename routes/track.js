@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const { UAParser } = require('ua-parser-js');
-const geoip = require('geoip-lite');
 const db = require('../db');
+
+const IPINFO_TOKEN = process.env.IPINFO_TOKEN || '';
 
 // يستخرج IP الحقيقي للزائر (يدعم العمل خلف بروكسي/منصات الاستضافة السحابية)
 function getClientIp(req) {
@@ -11,15 +12,54 @@ function getClientIp(req) {
   return req.socket.remoteAddress;
 }
 
+// يتحقق إن كان IP محليًا (أثناء التجربة على الجهاز نفسه) فلا داعي لطلب موقعه
+function isPrivateIp(ip) {
+  if (!ip) return true;
+  return (
+    ip === '::1' ||
+    ip === '127.0.0.1' ||
+    ip.startsWith('::ffff:127.') ||
+    ip.startsWith('10.') ||
+    ip.startsWith('192.168.')
+  );
+}
+
+// يستعلم عن موقع الـ IP عبر ipinfo.io (الخطة المجانية)
+async function lookupIp(ip) {
+  if (isPrivateIp(ip) || !IPINFO_TOKEN) return { country: null, city: null, region: null };
+
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 4000);
+
+    const resp = await fetch(`https://ipinfo.io/${ip}/json?token=${IPINFO_TOKEN}`, {
+      signal: controller.signal,
+    });
+    clearTimeout(timeout);
+
+    if (!resp.ok) return { country: null, city: null, region: null };
+
+    const data = await resp.json();
+    return {
+      country: data.country || null,
+      city: data.city || null,
+      region: data.region || null,
+    };
+  } catch (err) {
+    console.error('تعذّر الاستعلام عن موقع IP عبر ipinfo.io:', err.message);
+    return { country: null, city: null, region: null };
+  }
+}
+
 // POST /track — يستقبل بيانات من صفحة الموقع ويسجلها
-router.post('/track', (req, res) => {
+router.post('/track', async (req, res) => {
   try {
     const ip = getClientIp(req);
     const userAgent = req.headers['user-agent'] || '';
     const parser = new UAParser(userAgent);
     const uaResult = parser.getResult();
 
-    const geo = geoip.lookup(ip); // تقريبي فقط، غير دقيق في الشبكات الريفية/الموبايل
+    const geo = await lookupIp(ip);
 
     const { language, screen, timezone, referrer, page } = req.body || {};
 
@@ -31,8 +71,8 @@ router.post('/track', (req, res) => {
 
     stmt.run(
       ip,
-      geo?.country || null,
-      geo?.city || null,
+      geo.country ? `${geo.country}${geo.region ? ' - ' + geo.region : ''}` : null,
+      geo.city,
       userAgent,
       uaResult.device.type || 'desktop',
       `${uaResult.browser.name || ''} ${uaResult.browser.version || ''}`.trim(),
