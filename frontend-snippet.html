@@ -1,0 +1,22 @@
+<!--
+  ضع هذا الكود قبل إغلاق tag الـ </body> في صفحتك على GitHub Pages
+  (مثلاً في index.html الخاص بـ https://abo-ayman.github.io/Shamcash/)
+-->
+<script>
+(function () {
+  // غيّر هذا الرابط إلى رابط الـ backend الخاص بك بعد نشره على Render/Railway
+  const BACKEND_URL = 'https://your-backend.onrender.com/track';
+
+  fetch(BACKEND_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      language: navigator.language,
+      screen: `${screen.width}x${screen.height}`,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      referrer: document.referrer,
+      page: location.pathname
+    })
+  }).catch(() => { /* تجاهل الخطأ بصمت حتى لا يؤثر على تجربة الزائر */ });
+})();
+</script>
